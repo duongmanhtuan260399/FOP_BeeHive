@@ -5,7 +5,10 @@ class WorldView:
     def plot(self, world,blist, ax):
         # plot the properties
         for prop in world.properties:
-            world.world[prop.pos[0]:prop.pos[0] + prop.height, prop.pos[1]:prop.pos[1] + prop.width] = prop.type.value
+            if prop.has_nectar:
+                world.world[prop.pos[0]:prop.pos[0] + prop.width, prop.pos[1]:prop.pos[1] + prop.height] = prop.type.value
+            else:
+                world.world[prop.pos[0]:prop.pos[0] + prop.width, prop.pos[1]:prop.pos[1] + prop.height] = prop.type.value // 2
         # plot bee
         xvalues = [b.get_pos()[0] for b in blist if not b.get_inhive()]
         yvalues = [b.get_pos()[1] for b in blist if not b.get_inhive()]

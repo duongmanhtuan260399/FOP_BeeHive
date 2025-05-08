@@ -3,7 +3,11 @@ class HiveView:
         # plot the comb with levels
         if len(hive.clist) > 0:
             for comb in hive.clist:
-                hive.hive[comb.pos[0], comb.pos[1]] = comb.level
+                if comb.has_nectar:
+                    level = 5
+                else:
+                    level = 10
+                hive.hive[comb.pos[0], comb.pos[1]] = level
 
         # plot the bees
         xvalues = [b.get_pos()[0] for b in blist if b.get_inhive()]

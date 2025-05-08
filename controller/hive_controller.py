@@ -1,39 +1,37 @@
-import numpy as np
+from typing import List
 
-from model.hive import Comb
+from base.base_observable import BaseObservable
+from base.observer import Observer
+from model.buzzness import Bee
 
 
-class HiveController:
+class HiveController(BaseObservable, Observer):
+
     def __init__(self, hive):
+        super().__init__()
         self.hive = hive
-        self.building_phase = False
-        self.comb_build_timer = 0
+        self.path_to_flower = []
 
-    def update_comb_building(self):
-        hive_grid = self.hive.hive
+    def __add_nectar(self):
+        for comb in self.hive.clist:
+            if not comb.has_nectar:
+                comb.has_nectar = True
+                break
+            else:
+                continue
 
-        total_combs = np.count_nonzero(hive_grid != 10)
-        full_combs = np.count_nonzero(hive_grid == 5)
+    def __spread_path(self, path : List):
+        self.path_to_flower = path
+        self.notify()
 
-        if (total_combs > 0 and full_combs / total_combs >= 0.7) or total_combs == 0:
-            self.building_phase = True
+    def update(self, observable: BaseObservable) -> None:
+        if isinstance(observable,Bee):
+            if observable.inhive:
+                if observable.hasNectar:
+                    print(f"Bee {observable.ID} came back to hive with nectar")
+                    observable.hasNectar = False
+                    self.__add_nectar()
+                    if len(observable.path_to_flower)>0:
+                        self.__spread_path(observable.path_to_flower)
 
-        if self.building_phase:
-            self.comb_build_timer += 1
-            if self.comb_build_timer >= 60:
-                self.build_next_comb()
-                self.comb_build_timer = 0
 
-    def build_next_comb(self):
-        hive_matrix = self.hive.hive
-        rows, cols = hive_matrix.shape
-
-        for i in range(rows):
-            for j in range(cols):
-                if hive_matrix[i, j] == 10:  # no comb yet
-                    # Place new comb
-                    hive_matrix[i, j] = 0
-                    new_comb = Comb(pos=(i, j), level=0)
-                    self.hive.clist.append(new_comb)
-                    print(f"Built new comb at ({i},{j})")
-                    return  # Build only one

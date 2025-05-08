@@ -1,114 +1,84 @@
-import math
-from typing import Tuple, List
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
+from datetime import datetime, timedelta
 
-# Define the allowed moves
+# Start date of the project
+start_date = datetime(2025, 5, 1)
 
-# Define Position type hint for clarity
-Position = Tuple[int, int]
-Move = Tuple[int, int]
+# Task assignments with (assignee, task name, duration in days) in waterfall order
+ordered_tasks = [
+    ("David", "Literature review", 5),
+    ("Dan", "Finalize system requirements", 5),
+    ("Dongwoo", "Obtain ethical approvals", 10),
+    ("Dongwoo", "System architecture (pipeline & app design)", 10),
+    ("David", "Develop occupancy detection algorithm", 10),
+    ("Dan", "Build smartphone app prototype", 10),
+    ("Dongwoo", "Data collection & model refinement", 10),
+    ("Dongwoo", "System integration & deployment", 10),
+    ("Dongwoo", "Pilot testing with initial users", 10),
+    ("David", "Full-scale data collection", 7),
+    ("Dongwoo", "Statistical analysis of results", 7),
+    ("Dan", "System refinement", 8),
+    ("Dan", "Report writing & publications", 8)
+]
 
-def find_path(hive_pos: Position, flower_pos: Position) -> List[Move]:
-    """
-    Calculates a sequence of moves from hive_pos to flower_pos using VALID_MOVES.
+# Define a unique color for each assignee
+assignee_colors = {
+    "David": "#1f77b4",   # blue
+    "Dan": "#ff7f0e",     # orange
+    "Dongwoo": "#2ca02c"  # green
+}
 
-    Args:
-        hive_pos: A tuple (x, y) representing the starting hive position.
-        flower_pos: A tuple (x, y) representing the target flower position.
+# Prepare lists for plotting
+task_names = []
+start_dates = []
+durations = []
+task_colors = []
+task_assignees = []
 
-    Returns:
-        A list of moves (tuples from VALID_MOVES) representing the path.
-        Returns an empty list if the start and end positions are the same.
-    """
-    # --- Input Validation (Optional but good practice) ---
-    if not (isinstance(hive_pos, (tuple, list)) and len(hive_pos) == 2 and
-            isinstance(flower_pos, (tuple, list)) and len(flower_pos) == 2):
-        raise ValueError("Positions must be tuples or lists of length 2 (x, y)")
-    if not all(isinstance(coord, int) for coord in hive_pos + flower_pos):
-         raise ValueError("Coordinates must be integers")
-    # Make positions mutable tuples for easier updates if needed (or use lists)
-    current_pos = list(hive_pos)
-    target_pos = tuple(flower_pos) # Target remains constant
+current_date = start_date
 
-    path_moves: List[Move] = []
+# Fill in task data
+for assignee, task_name, duration in ordered_tasks:
+    task_names.append(task_name)
+    start_dates.append(current_date)
+    durations.append(duration)
+    task_colors.append(assignee_colors[assignee])
+    task_assignees.append(assignee)
+    current_date += timedelta(days=duration)
 
-    print(f"Starting pathfinding from {tuple(current_pos)} to {target_pos}")
+# Plotting the Gantt chart
+fig, ax = plt.subplots(figsize=(14, 9))
+bars = ax.barh(task_names, durations, left=start_dates, color=task_colors, edgecolor='black')
 
-    # Use a loop that continues as long as we haven't reached the target
-    # Add a safety break for potential infinite loops (though unlikely here)
-    max_iterations = 10000
-    iterations = 0
+# Add duration and assignee labels inside each bar
+for bar, assignee in zip(bars, task_assignees):
+    width = bar.get_width()
+    start_x = bar.get_x()
+    ax.text(start_x + width / 2, bar.get_y() + bar.get_height() / 2,
+            f"{int(width)}d\n{assignee}", ha='center', va='center',
+            fontsize=9, color='white', fontweight='bold')
 
-    while tuple(current_pos) != target_pos:
-        if iterations >= max_iterations:
-            print("Warning: Maximum iterations reached. Aborting pathfinding.")
-            # Depending on requirements, you might raise an error or return partial path
-            raise RuntimeError("Pathfinding exceeded maximum iterations")
-            # return path_moves # Or return the path found so far
+# Axis labels and title
+ax.set_xlabel('Timeline', fontsize=12, fontweight='bold')
+ax.set_title('Project Gantt Chart Colored by Assignee (Waterfall Model)', fontsize=14, fontweight='bold')
+ax.xaxis.set_major_locator(mdates.MonthLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
 
-        # Calculate the difference vector to the target
-        dx = target_pos[0] - current_pos[0]
-        dy = target_pos[1] - current_pos[1]
+# Rotate x-ticks and format
+plt.xticks(rotation=45, fontsize=10)
+plt.yticks(fontsize=10)
+plt.tight_layout()
 
-        # Determine the best move based on the direction vector signs
-        # math.copysign(1, x) returns 1.0 with the sign of x, or 0.0 if x is 0
-        # int() converts this to -1, 0, or 1
-        move_x = int(math.copysign(1, dx)) if dx != 0 else 0
-        move_y = int(math.copysign(1, dy)) if dy != 0 else 0
+# Add legend
+legend_patches = [mpatches.Patch(color=color, label=person) for person, color in assignee_colors.items()]
+ax.legend(handles=legend_patches, title="Assignee", loc='upper right')
 
-        # The chosen move is (move_x, move_y)
-        chosen_move: Move = (move_x, move_y)
+# Add gridlines and reverse y-axis for proper order
+plt.grid(True, axis='x', linestyle='--', alpha=0.6)
+plt.gca().invert_yaxis()
 
-        # --- Verification (optional, as our logic guarantees it's valid) ---
-        # if chosen_move not in VALID_MOVES and chosen_move != (0,0):
-        #    # This condition should ideally never be met with the current logic
-        #    raise ValueError(f"Calculated move {chosen_move} is not in VALID_MOVES")
-        # If dx and dy are both 0, we should already be at the target and the loop condition handles this.
-
-        # Apply the move to the current position
-        current_pos[0] += chosen_move[0]
-        current_pos[1] += chosen_move[1]
-
-        print(f"Move added to list: {chosen_move}")
-        # Record the move
-        path_moves.append(chosen_move)
-
-        # print(f"  Moved {chosen_move}, New position: {tuple(current_pos)}") # Optional debug print
-
-        iterations += 1
-
-    print(f"Path found with {len(path_moves)} moves.")
-    return path_moves
-
-# --- Example Usage ---
-hive_location = (15, 15)
-flower_location = (45, 32)
-world_size = (50, 50) # Context, not used in calculation
-
-print(f"World Size: {world_size}")
-print(f"Hive Position: {hive_location}")
-print(f"Flower Position: {flower_location}")
-print("-" * 20)
-
-try:
-    moves = find_path(hive_location, flower_location)
-    print("-" * 20)
-    # print("Calculated Moves:")
-    # print(moves) # You can print the full list if needed
-
-    # Verify the path (optional)
-    final_pos_check = list(hive_location)
-    for move in moves:
-        final_pos_check[0] += move[0]
-        final_pos_check[1] += move[1]
-
-    print(f"Starting position: {hive_location}")
-    print(f"Target position:   {flower_location}")
-    print(f"Calculated final position after moves: {tuple(final_pos_check)}")
-    print(f"Path length: {len(moves)}")
-    if tuple(final_pos_check) == flower_location:
-        print("Verification successful: Path correctly reaches the flower.")
-    else:
-        print("Verification failed: Path does not reach the flower.")
-
-except (ValueError, RuntimeError) as e:
-    print(f"Error during pathfinding: {e}")
+# Save chart as image
+plt.savefig("gantt_chart_by_assignee.png")
+plt.show()

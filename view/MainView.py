@@ -43,14 +43,29 @@ class MainView():
     def simulate(self,time_steps, num_bees, config_file, visualize=True):
         hive_pos = (15,15,4,4)
         hive_size = (40, 40)
-        bees = [Bee(i, (0,0),(hive_pos[0],hive_pos[1]),hive_size) for i in range(1,num_bees)]
+        world_size = (50, 50)
 
-        world = World(hive_pos)
+        world = World(hive_pos, world_size)
         self.read_property(config_file,world)
         world_controller = WorldController(world)
 
         hive = Hive(hive_size)
         hiveController = HiveController(hive)
+
+        bees = []
+        for i in range(num_bees):
+            bee = Bee(i+1, (0, 0), (hive_pos[0], hive_pos[1]), hive_size, world_size)
+            # Register observers
+            bee.attach(world_controller)
+            bee.attach(hiveController)
+
+            # Register observable
+            hiveController.attach(bee)
+            world_controller.attach(bee)
+
+            bees.append(bee)
+
+
         history = []
         if visualize:
             plt.ion()
@@ -59,9 +74,6 @@ class MainView():
         for t in range(1, time_steps + 1):
             for bee in bees:
                 bee.step_change()
-                world_controller.update_bee_moved(bee)
-                print(bee.pos)
-            hiveController.update_comb_building()
 #            history.append({'time': t, 'honey': world.hive.honey_storage, 'comb': world.hive.comb_built})
             if visualize:
                 axes[0].clear()
@@ -82,4 +94,4 @@ class MainView():
 
 if __name__ == "__main__":
     main = MainView()
-    main.simulate(time_steps=20,num_bees=20,config_file='properties.json',visualize=True)
+    main.simulate(time_steps=120,num_bees=5,config_file='properties.json',visualize=True)
