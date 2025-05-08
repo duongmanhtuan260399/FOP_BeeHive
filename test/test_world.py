@@ -1,60 +1,55 @@
 import unittest
-from unittest import TestCase
-from model.buzzness import Bee
-from model.world import PropertyType, Property, World
-import matplotlib.pyplot as plt
-import numpy as np
+import json
+import tempfile
+from model.world import World, PropertyType, Property
 
-
-class TestWorld(TestCase):
-
+class TestWorld(unittest.TestCase):
     def setUp(self):
-        """ Set up test fixtures """
-        self.bees = [
-            Bee("bee1",(5, 5)),
-            Bee("bee2",(10, 10)),
-            Bee("bee3",(15, 15))
-        ]
-        self.hive_pos = (2, 2, 5, 5)
-        self.world = World(self.bees, self.hive_pos)
+        self.hive_pos = (15, 15, 4, 4)
+        self.world_size = (50, 50)
+        self.world = World(self.hive_pos, self.world_size)
+        
+        # Create test properties
+        self.tree = Property(PropertyType.TREE, (10, 10), 2, 2, False)
+        self.flower = Property(PropertyType.FLOWER, (20, 20), 1, 1, True)
+        self.water = Property(PropertyType.WATER, (30, 30), 3, 3, False)
+
+    def test_initialization(self):
+        """Test world initialization"""
+        self.assertEqual(self.world.hive_pos, self.hive_pos)
+        self.assertEqual(len(self.world.properties), 0)
 
     def test_add_property(self):
-        """ Test adding a property """
-        flower = Property(PropertyType.FLOWER, (1, 1), 2, 2, has_nectar=True)
-        self.world.add_property(flower)
-        self.assertEqual(len(self.world.properties), 1)
-        self.assertIs(self.world.properties[0], flower)
+        """Test adding properties to the world"""
+        self.world.add_property(self.tree)
+        self.world.add_property(self.flower)
+        
+        properties = self.world.properties
+        self.assertEqual(len(properties), 2)
+        self.assertTrue(any(p.type == PropertyType.TREE for p in properties))
+        self.assertTrue(any(p.type == PropertyType.FLOWER for p in properties))
 
-    def test_world_initialization(self):
-        """ Test world initialization """
-        expected_world = np.full(World.WORLD_SIZE, 5)
-        np.testing.assert_array_equal(self.world.world, expected_world)
+    def test_property_types(self):
+        """Test different property types"""
+        self.world.add_property(self.tree)
+        self.world.add_property(self.flower)
+        self.world.add_property(self.water)
+        
+        properties = self.world.properties
+        self.assertEqual(len(properties), 3)
+        self.assertTrue(any(p.type == PropertyType.TREE for p in properties))
+        self.assertTrue(any(p.type == PropertyType.FLOWER for p in properties))
+        self.assertTrue(any(p.type == PropertyType.WATER for p in properties))
 
-    def test_plot(self):
-        """ Test plot (basic check if plot runs without errors) """
-        fig, ax = plt.subplots()
-        try:
-            self.world.plot(ax)
-        except Exception as e:
-            self.fail(f"Plotting raised an exception: {e}")
-        finally:
-            plt.close(fig)
-
-    def test_plot_with_property(self):
-        """ Test plot with a property added """
-        flower = Property(PropertyType.FLOWER, (1, 1), 2, 2, has_nectar=True)
-        self.world.add_property(flower)
-
-        fig, ax = plt.subplots()
-        self.world.plot(ax)
-
-        # Check that the flower area in the world array was updated
-        expected_value = PropertyType.FLOWER.value
-        world_array_section = self.world.world[1:3, 1:3]
-        self.assertTrue(np.all(world_array_section == expected_value))
-
-        plt.close(fig)
-
+    def test_property_attributes(self):
+        """Test property attributes"""
+        self.world.add_property(self.flower)
+        flower: Property = next(p for p in self.world.properties if p.type == PropertyType.FLOWER)
+        
+        self.assertEqual(flower.pos, (20, 20))
+        self.assertEqual(flower.width, 1)
+        self.assertEqual(flower.height, 1)
+        self.assertTrue(flower.has_nectar)
 
 if __name__ == '__main__':
     unittest.main()
