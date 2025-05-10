@@ -5,7 +5,19 @@ from model.hive import Hive, Comb
 from model.buzzness import Bee
 
 class TestHiveController(unittest.TestCase):
+    """
+    [2.2 Hive Controller] Test suite for the HiveController class.
+    
+    This test suite verifies:
+    - Controller initialization and basic properties
+    - Nectar storage in hive combs
+    - Path information sharing between bees
+    - Bee state management when returning to hive
+    """
+
     def setUp(self):
+        """Initialize test environment with common test data"""
+        # [2.2 Hive Controller] Basic setup
         self.hive = Hive((40, 40))
         self.controller = HiveController(self.hive)
         
@@ -18,12 +30,12 @@ class TestHiveController(unittest.TestCase):
         self.hive.clist = [self.comb1, self.comb2]
 
     def test_initialization(self):
-        """Test controller initialization"""
+        """[2.2 Hive Controller] Test controller initialization"""
         self.assertEqual(self.controller.hive, self.hive)
         self.assertEqual(self.controller.path_to_flower, [])
 
     def test_add_nectar(self):
-        """Test adding nectar to combs"""
+        """[2.2.1 Nectar storage] Test adding nectar to combs"""
         # Test adding nectar to empty comb
         self.controller._HiveController__add_nectar()
         self.assertTrue(self.comb1.has_nectar)
@@ -33,13 +45,13 @@ class TestHiveController(unittest.TestCase):
         self.assertTrue(self.comb2.has_nectar)
 
     def test_spread_path(self):
-        """Test spreading path information"""
+        """[2.2.2 Path information sharing] Test spreading path information"""
         test_path = [(1, 1), (2, 2), (3, 3)]
         self.controller._HiveController__spread_path(test_path)
         self.assertEqual(self.controller.path_to_flower, test_path)
 
     def test_update_with_nectar(self):
-        """Test update when bee returns with nectar"""
+        """[2.2 Hive Controller] Test update when bee returns with nectar"""
         # Setup bee with nectar and path
         self.bee.hasNectar = True
         self.bee.inhive = True
@@ -59,7 +71,7 @@ class TestHiveController(unittest.TestCase):
         self.controller.notify.assert_called_once()
 
     def test_update_without_nectar(self):
-        """Test update when bee returns without nectar"""
+        """[2.2 Hive Controller] Test update when bee returns without nectar"""
         # Setup bee without nectar
         self.bee.hasNectar = False
         self.bee.inhive = True
@@ -74,7 +86,7 @@ class TestHiveController(unittest.TestCase):
         self.controller.notify.assert_not_called()
 
     def test_update_when_not_in_hive(self):
-        """Test update when bee is not in hive"""
+        """[2.2 Hive Controller] Test update when bee is not in hive"""
         # Setup bee not in hive
         self.bee.inhive = False
         self.bee.hasNectar = True
