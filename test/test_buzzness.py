@@ -13,7 +13,7 @@ class TestBee(unittest.TestCase):
         self.bee = Bee(1, (0, 0), self.hive_pos, self.hive_size, self.world_size)
 
     def test_initialization(self):
-        """Test bee initialization and basic properties"""
+        """[1.1 Bee] Test bee initialization and basic properties"""
         self.assertEqual(self.bee.ID, 1)
         self.assertEqual(self.bee.pos, (0, 0))
         self.assertTrue(self.bee.inhive)
@@ -22,7 +22,7 @@ class TestBee(unittest.TestCase):
         self.assertEqual(self.bee.energy, 0)
 
     def test_state_transitions(self):
-        """Test bee state transitions"""
+        """[1.1.1 State Management] Test bee state transitions"""
         # Test energy charging in hive
         self.bee.energy = 0
         self.bee.step_change()
@@ -34,7 +34,7 @@ class TestBee(unittest.TestCase):
         self.assertFalse(self.bee.inhive)
 
     def test_movement(self):
-        """Test bee movement mechanics"""
+        """[1.1.2 Movement] Test bee movement mechanics"""
         initial_pos = self.bee.pos
 
         # Test movement within bounds
@@ -47,7 +47,7 @@ class TestBee(unittest.TestCase):
         self.assertEqual(self.bee.pos, (self.world_size[0]-2, self.world_size[1]-2))  # Should stay at safe distance from boundary
 
     def test_nectar_collection(self):
-        """Test bee nectar collection behavior"""
+        """[1.1.4 Path finding] Test bee nectar collection behavior"""
         # Test setting nectar found
         self.bee.set_nectar_found()
         self.assertTrue(self.bee.hasNectar)
@@ -55,7 +55,7 @@ class TestBee(unittest.TestCase):
         self.assertFalse(self.bee.inhive)
 
     def test_energy_management(self):
-        """Test bee energy management"""
+        """[1.1.3 Energy Management] Test bee energy management"""
         # Test energy decrease during movement
         initial_energy = 50
         self.bee.energy = initial_energy
@@ -69,7 +69,7 @@ class TestBee(unittest.TestCase):
         self.assertEqual(self.bee.energy, 25)
 
     def test_getters_setters(self):
-        """Test getter and setter methods"""
+        """[1.1 Bee] Test getter and setter methods"""
         self.assertEqual(self.bee.get_pos(), (0, 0))
         self.assertTrue(self.bee.get_inhive())
 
@@ -83,7 +83,7 @@ class TestBee(unittest.TestCase):
 
     @patch('random.choice')
     def test_step_change(self, mock_random_choice):
-        """Test that step_change correctly updates the bee's position"""
+        """[1.1 Bee] Test that step_change correctly updates the bee's position"""
         # Mock random.choice to always pick (1, 0)
         self.bee.inhive = False
         self.bee.pos = (20,20)
@@ -98,7 +98,7 @@ class TestBee(unittest.TestCase):
         self.assertEqual(new_pos, expected_pos)
 
     def test_movement_with_obstacle(self):
-        """Test bee movement when encountering an obstacle"""
+        """[1.1.2 Movement] Test bee movement when encountering an obstacle"""
         # Setup bee outside hive
         self.bee.inhive = False
         self.bee.pos = (10, 10)
@@ -151,7 +151,7 @@ class TestBee(unittest.TestCase):
         self.assertFalse(result)
 
     def test_boundary_behavior(self):
-        """Test bee behavior when reaching world boundaries"""
+        """[1.1.2 Movement] Test bee behavior when reaching world boundaries"""
         # Setup bee outside hive
         self.bee.inhive = False
         self.bee.energy = 50
@@ -186,7 +186,7 @@ class TestBee(unittest.TestCase):
         self.assertTrue(result)
 
     def test_hive_to_world_transition(self):
-        """Test bee transition from hive to world"""
+        """[1.1.1 State Management] Test bee transition from hive to world"""
         # Setup bee in hive with enough energy
         self.bee.inhive = True
         self.bee.energy = 60
@@ -220,7 +220,7 @@ class TestBee(unittest.TestCase):
         self.assertEqual(self.bee.pos, (0, 0))
 
     def test_alternative_move_generation(self):
-        """Test that bees generate appropriate alternative moves"""
+        """[1.1.2 Movement] Test that bees generate appropriate alternative moves"""
         self.bee.inhive = False
         self.bee.energy = 50
         self.bee.state = BeeState.WANDERING
