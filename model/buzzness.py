@@ -8,7 +8,7 @@ from utils.utils import Move, find_path_to_flower, find_path_to_hive
 
 class BeeState(Enum):
     """
-    Enumeration of possible states for a bee in the simulation.
+    [1.1.1 State Management] Enumeration of possible states for a bee in the simulation.
     
     States:
         WANDERING: Bee is exploring the world randomly
@@ -22,7 +22,7 @@ class BeeState(Enum):
 
 class Bee(BaseObservable, Observer):
     """
-    Represents a worker bee in the simulation with its behavior and state management.
+    [1.1 Bee] Represents a worker bee in the simulation with its behavior and state management.
     
     The bee can:
     - Move around the world
@@ -47,7 +47,7 @@ class Bee(BaseObservable, Observer):
         _move_invalid (bool): Flag for invalid moves
     """
 
-    # Constants
+    # [1.1.3 Energy Management] Constants for energy management
     MIN_ENERGY_TO_LEAVE = 50
     ENERGY_CHARGE_AMOUNT = 25
     ENERGY_CONSUMPTION = 1
@@ -81,7 +81,7 @@ class Bee(BaseObservable, Observer):
 
     def _adjust_boundaries(self, x, y):
         """
-        Adjust coordinates to stay within world boundaries.
+        [1.1.2 Movement] Adjust coordinates to stay within world boundaries.
         
         Args:
             x (int): X coordinate
@@ -96,7 +96,7 @@ class Bee(BaseObservable, Observer):
 
     def _try_alternative_move(self, old_pos):
         """
-        Attempt to find an alternative move when the current move is invalid.
+        [1.1.2 Movement] Attempt to find an alternative move when the current move is invalid.
         
         Args:
             old_pos (tuple): The position before the invalid move
@@ -126,7 +126,7 @@ class Bee(BaseObservable, Observer):
 
     def _execute_move(self, move: Move) -> bool:
         """
-        Execute a move for the bee, handling boundaries and obstacles.
+        [1.1.2 Movement] Execute a move for the bee, handling boundaries and obstacles.
         
         Args:
             move (Move): The move to execute
@@ -163,7 +163,7 @@ class Bee(BaseObservable, Observer):
 
     def _handle_hive_charging(self) -> bool:
         """
-        Handle energy charging when bee is in hive.
+        [1.1.3 Energy Management] Handle energy charging when bee is in hive.
         
         Returns:
             bool: True if bee should continue moving, False if charging
@@ -176,7 +176,7 @@ class Bee(BaseObservable, Observer):
 
     def _handle_hive_exit(self) -> bool:
         """
-        Handle bee exiting the hive.
+        [1.1.1 State Management] Handle bee exiting the hive.
         
         Returns:
             bool: True if bee exited hive, False otherwise
@@ -197,7 +197,7 @@ class Bee(BaseObservable, Observer):
 
     def _get_next_move(self) -> Move:
         """
-        Determine the next move based on current state.
+        [1.1.1 State Management] Determine the next move based on current state.
         
         Returns:
             Move: The next move to execute
@@ -236,7 +236,7 @@ class Bee(BaseObservable, Observer):
 
     def step_change(self):
         """
-        Update the bee's state and position for each timestep.
+        [1.1 Bee] Update the bee's state and position for each timestep.
         
         This method handles:
         - Energy management
@@ -280,7 +280,7 @@ class Bee(BaseObservable, Observer):
 
     def set_nectar_found(self):
         """
-        Update bee state when nectar is found.
+        [1.1.4 Path finding] Update bee state when nectar is found.
         Sets paths to flower and hive, and changes state to RETURNING.
         """
         self.path_to_flower = find_path_to_flower((self.hive_pos[0], self.hive_pos[1]), self.pos)
@@ -290,12 +290,12 @@ class Bee(BaseObservable, Observer):
         self.inhive = False
 
     def step_back(self):
-        """Mark the last move as invalid, called by WorldController when bee hits an obstacle."""
+        """[1.1.2 Movement] Mark the last move as invalid, called by WorldController when bee hits an obstacle."""
         self._move_invalid = True
 
     def update(self, observable: BaseObservable) -> None:
         """
-        Handle updates from observed objects (HiveController).
+        [1.1.4 Path finding] Handle updates from observed objects (HiveController).
         
         Args:
             observable (BaseObservable): The object that triggered the update
