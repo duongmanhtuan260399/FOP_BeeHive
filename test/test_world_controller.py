@@ -5,7 +5,19 @@ from model.world import World, PropertyType, Property
 from model.buzzness import Bee, BeeState
 
 class TestWorldController(unittest.TestCase):
+    """
+    [2.1 World Controller] Test suite for the WorldController class.
+    
+    This test suite verifies:
+    - Controller initialization and basic properties
+    - Collision detection between bees and properties
+    - Nectar collection from flowers
+    - Boundary management and obstacle handling
+    """
+
     def setUp(self):
+        """Initialize test environment with common test data"""
+        # [2.1 World Controller] Basic setup
         self.hive_pos = (15, 15, 4, 4)
         self.world_size = (50, 50)
         self.world = World(self.hive_pos, self.world_size)
@@ -25,13 +37,13 @@ class TestWorldController(unittest.TestCase):
         self.world.add_property(self.water)
 
     def test_initialization(self):
-        """Test controller initialization"""
+        """[2.1 World Controller] Test controller initialization"""
         self.assertEqual(self.controller.world, self.world)
         self.assertEqual(self.controller.width, self.world_size[0])
         self.assertEqual(self.controller.height, self.world_size[1])
 
     def test_update_bee_moved_to_flower(self):
-        """Test bee movement to flower with nectar"""
+        """[2.1.2 Nectar collection] Test bee movement to flower with nectar"""
         # Position bee at flower location
         self.bee.pos = (10, 10)
         self.bee.inhive = False
@@ -49,7 +61,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.set_nectar_found.assert_called_once()
 
     def test_update_bee_moved_to_empty_flower(self):
-        """Test bee movement to flower without nectar"""
+        """[2.1.2 Nectar collection] Test bee movement to flower without nectar"""
         # Position bee at flower location
         self.bee.pos = (10, 10)
         self.bee.inhive = False
@@ -68,7 +80,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.set_nectar_found.assert_not_called()
 
     def test_update_bee_moved_to_tree(self):
-        """Test bee movement to tree"""
+        """[2.1.1 Collision detection] Test bee movement to tree"""
         # Position bee at tree location
         self.bee.pos = (20, 20)
         self.bee.inhive = False
@@ -84,7 +96,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.set_nectar_found.assert_not_called()
 
     def test_update_bee_in_hive(self):
-        """Test update when bee is in hive"""
+        """[2.1 World Controller] Test update when bee is in hive"""
         # Setup bee in hive
         self.bee.inhive = True
         
@@ -98,7 +110,7 @@ class TestWorldController(unittest.TestCase):
         self.controller._WorldController__update_bee_moved.assert_not_called()
 
     def test_update_bee_outside_hive(self):
-        """Test update when bee is outside hive"""
+        """[2.1 World Controller] Test update when bee is outside hive"""
         # Setup bee outside hive
         self.bee.inhive = False
         self.bee.pos = (10, 10)  # At flower location
@@ -113,7 +125,7 @@ class TestWorldController(unittest.TestCase):
         self.controller._WorldController__update_bee_moved.assert_called_once_with(self.bee)
 
     def test_update_bee_with_nectar(self):
-        """Test update when bee already has nectar"""
+        """[2.1.2 Nectar collection] Test update when bee already has nectar"""
         # Setup bee with nectar
         self.bee.hasNectar = True
         self.bee.inhive = False
@@ -129,7 +141,7 @@ class TestWorldController(unittest.TestCase):
         self.controller._WorldController__update_bee_moved.assert_called_once()
 
     def test_obstacle_detection(self):
-        """Test obstacle detection and bee movement prevention"""
+        """[2.1.1 Collision detection] Test obstacle detection and bee movement prevention"""
         # Position bee at tree location
         self.bee.pos = (20, 20)
         self.bee.inhive = False
@@ -145,7 +157,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.step_back.assert_called_once()
 
     def test_multiple_obstacles(self):
-        """Test handling of multiple obstacles"""
+        """[2.1.1 Collision detection] Test handling of multiple obstacles"""
         # Add another obstacle near the first one
         self.world.add_property(Property(PropertyType.TREE, (21, 21), 2, 2, False))
         
@@ -164,7 +176,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.step_back.assert_called_once()
 
     def test_obstacle_edge_cases(self):
-        """Test obstacle detection at property edges"""
+        """[2.1.1 Collision detection] Test obstacle detection at property edges"""
         # Test bee at property edge
         self.bee.pos = (19, 20)  # Just outside tree
         self.bee.inhive = False
@@ -187,7 +199,7 @@ class TestWorldController(unittest.TestCase):
         self.bee.step_back.assert_called_once()
 
     def test_flower_detection_and_pathfinding(self):
-        """Test complete flow of flower detection and path-finding"""
+        """[2.1.2 Nectar collection] Test complete flow of flower detection and path-finding"""
         # Position bee at flower location
         self.bee.pos = (10, 10)
         self.bee.inhive = False
