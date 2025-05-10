@@ -41,7 +41,7 @@ class MainView():
                 world.add_property(Property(prop, (x, y), width, height, has_nectar))
 
     def simulate(self,time_steps, num_bees, config_file, visualize=True):
-        hive_pos = (15,15,4,4)
+        hive_pos = (15,15,2,2)
         hive_size = (40, 40)
         world_size = (50, 50)
 
