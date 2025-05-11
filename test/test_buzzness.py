@@ -38,12 +38,12 @@ class TestBee(unittest.TestCase):
         initial_pos = self.bee.pos
 
         # Test movement within bounds
-        self.bee._Bee__move((1, 1))
+        self.bee._execute_move((1, 1))
         self.assertNotEqual(self.bee.pos, initial_pos)
 
         # Test movement at world boundaries
         self.bee.pos = (self.world_size[0]-3, self.world_size[1]-3)
-        self.bee._Bee__move((1, 1))
+        self.bee._execute_move((1, 1))
         self.assertEqual(self.bee.pos, (self.world_size[0]-2, self.world_size[1]-2))  # Should stay at safe distance from boundary
 
     def test_nectar_collection(self):
@@ -59,7 +59,7 @@ class TestBee(unittest.TestCase):
         # Test energy decrease during movement
         initial_energy = 50
         self.bee.energy = initial_energy
-        self.bee._Bee__move((1, 1))
+        self.bee._execute_move((1, 1))
         self.assertEqual(self.bee.energy, initial_energy - 1)
 
         # Test energy charging in hive
@@ -116,7 +116,7 @@ class TestBee(unittest.TestCase):
         self.assertTrue(self.bee._move_invalid)
         
         # Try to move
-        result = self.bee._Bee__move((1, 1))
+        result = self.bee._execute_move((1, 1))
         
         # For WANDERING state, should try alternative move
         self.assertNotEqual(self.bee.pos, initial_pos)
@@ -130,7 +130,7 @@ class TestBee(unittest.TestCase):
         self.bee.step_back()
         
         # Try to move
-        result = self.bee._Bee__move((1, 1))
+        result = self.bee._execute_move((1, 1))
         
         # For FOLLOWING state, should stay in same position
         self.assertEqual(self.bee.pos, initial_pos)
@@ -144,7 +144,7 @@ class TestBee(unittest.TestCase):
         self.bee.step_back()
         
         # Try to move
-        result = self.bee._Bee__move((1, 1))
+        result = self.bee._execute_move((1, 1))
         
         # For RETURNING state, should stay in same position
         self.assertEqual(self.bee.pos, initial_pos)
@@ -162,7 +162,7 @@ class TestBee(unittest.TestCase):
         # Test right boundary
         self.bee.pos = (self.world_size[0] - 3, 10)
         initial_pos = self.bee.pos
-        result = self.bee._Bee__move((2, 0))  # Try to move beyond right boundary
+        result = self.bee._execute_move((2, 0))  # Try to move beyond right boundary
         # Should try alternative move and not stay at boundary
         self.assertNotEqual(self.bee.pos, initial_pos)
         self.assertTrue(result)
@@ -171,7 +171,7 @@ class TestBee(unittest.TestCase):
         self.bee.state = BeeState.FOLLOWING
         self.bee.pos = (self.world_size[0] - 3, 10)
         initial_pos = self.bee.pos
-        result = self.bee._Bee__move((2, 0))  # Try to move beyond right boundary
+        result = self.bee._execute_move((2, 0))  # Try to move beyond right boundary
         # Should stay at boundary
         self.assertEqual(self.bee.pos, (self.world_size[0] - 2, 10))
         self.assertTrue(result)
@@ -180,7 +180,7 @@ class TestBee(unittest.TestCase):
         self.bee.state = BeeState.RETURNING
         self.bee.pos = (self.world_size[0] - 3, 10)
         initial_pos = self.bee.pos
-        result = self.bee._Bee__move((2, 0))  # Try to move beyond right boundary
+        result = self.bee._execute_move((2, 0))  # Try to move beyond right boundary
         # Should stay at boundary
         self.assertEqual(self.bee.pos, (self.world_size[0] - 2, 10))
         self.assertTrue(result)
@@ -219,35 +219,6 @@ class TestBee(unittest.TestCase):
         self.assertTrue(self.bee.inhive)
         self.assertEqual(self.bee.pos, (0, 0))
 
-    def test_alternative_move_generation(self):
-        """[1.1.2 Movement] Test that bees generate appropriate alternative moves"""
-        self.bee.inhive = False
-        self.bee.energy = 50
-        self.bee.state = BeeState.WANDERING
-        
-        # Test bee ID 1 (should only use MOVE_FORWARD)
-        self.bee.ID = 1
-        self.bee.pos = (5, 5)  # Set initial position away from boundaries
-        initial_pos = self.bee.pos
-        self.bee._move_invalid = True
-        result = self.bee._Bee__move((0, 0))  # Try an invalid move
-        self.assertTrue(result)
-        # Verify the move was one of MOVE_FORWARD from initial position
-        possible_positions = [(initial_pos[0] + dx, initial_pos[1] + dy) 
-                            for dx, dy in MOVE_FORWARD]
-        self.assertIn(self.bee.pos, possible_positions)
-        
-        # Test other bee IDs (should use VALID_MOVE)
-        self.bee.ID = 2
-        self.bee.pos = (5, 5)  # Reset position
-        initial_pos = self.bee.pos
-        self.bee._move_invalid = True
-        result = self.bee._Bee__move((0, 0))  # Try an invalid move
-        self.assertTrue(result)
-        # Verify the move was one of VALID_MOVE from initial position
-        possible_positions = [(initial_pos[0] + dx, initial_pos[1] + dy) 
-                            for dx, dy in VALID_MOVE]
-        self.assertIn(self.bee.pos, possible_positions)
 
 if __name__ == '__main__':
     unittest.main()

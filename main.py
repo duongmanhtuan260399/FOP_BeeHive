@@ -1,5 +1,9 @@
 import argparse
 import json
+import sys
+from json import JSONDecodeError
+
+import utils.constants
 from view.MainView import MainView
 
 # Read args
@@ -9,17 +13,54 @@ group.add_argument('-i','--interactive',action='store_true',help='Interactive mo
 group.add_argument('-b','--batch',action='store_true',help='Batch mode')
 parser.add_argument('-f','--map_file',type=str,help='Config JSON for world')
 parser.add_argument('-p','--param_file',type=str,help='Params JSON')
-parser.add_argument('--visualize',action='store_true',help='Enable visualization')
 args = parser.parse_args()
 
 # Setup view
 mainView = MainView()
 
+def _value_in_range(value, minimum, maximum):
+    if value < minimum or value > maximum:
+        return False
+    return True
+
+def get_positive_int(prompt, minimum, maximum):
+    while True:
+        try:
+            value = int(input(prompt))
+            if not _value_in_range(value, minimum, maximum):
+                print(f"Invalid input. Please enter a positive value between {minimum} and {maximum}.")
+            else:
+                return value
+        except ValueError:
+            print('Invalid input. Please enter a positive number')
+
+param_file = args.param_file if args.param_file else utils.constants.PARAMETER_FILE
+map_file = args.map_file if args.map_file else utils.constants.PROPERTY_FILE
+
 if args.interactive:
-    ts=int(input('Timesteps: ')); nb=int(input('Bees: ')); cf=input('Config file: ')
-    mainView.simulate(ts, nb, cf, visualize=args.visualize)
+    ts = get_positive_int('Timesteps: ', 1, 10000)
+    nb = get_positive_int('Bees: ',1,100)
+    mainView.simulate(ts, nb, map_file)
 else:
-    if not args.map_file or not args.param_file:
-        parser.error('Batch needs --map_file and --param_file')
-    params=json.load(open(args.param_file))
-    mainView.simulate(params.get('time_steps',100), params.get('num_bees',5), args.map_file, visualize=args.visualize)
+    try:
+        with open(param_file) as f:
+            params = json.load(f)
+    except FileNotFoundError:
+        print(f'Error: Parameter file {param_file} not found.')
+        sys.exit(1)
+    except JSONDecodeError:
+        print(f'Error: Parameter file {param_file} is not a valid JSON file.')
+        sys.exit(1)
+    try:
+        ts = int(params.get('time_steps'))
+        nb = int(params.get('num_bees'))
+    except (KeyError, ValueError, TypeError):
+        print(f'Error: Invalid parameters in {param_file}')
+        sys.exit(1)
+    if not _value_in_range(ts, 1, 10000):
+        print(f"Invalid input. Please enter number of time steps between 1 and 10000.")
+        sys.exit(1)
+    if not _value_in_range(nb, 1, 100):
+        print(f"Invalid input. Please enter number of bees between 1 and 100.")
+        sys.exit(1)
+    mainView.simulate(ts, nb, map_file)

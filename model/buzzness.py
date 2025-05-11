@@ -304,8 +304,12 @@ class Bee(BaseObservable, Observer):
         from controller.world_controller import WorldController
         
         if isinstance(observable, HiveController):
-            if random.uniform(0, 1) > self.COMMUNICATION_THRESHOLD:
+            chance = random.uniform(0, 1)
+            print(f"Bee {self.ID} receive path info with chance {chance} ")
+            if chance > self.COMMUNICATION_THRESHOLD:
                 if not self.path_to_flower or len(self.path_to_flower) >= len(observable.path_to_flower):
                     self.path_to_flower = observable.path_to_flower.copy()
                     print(f"Bee {self.ID} saved flower information with {len(self.path_to_flower)} steps")
+            else:
+                print(f"Bee {self.ID} did not receive flower information")
 
