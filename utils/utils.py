@@ -31,38 +31,25 @@ def find_path_to_flower(hive_pos: Position, flower_pos: Position) -> List[Move]:
     while tuple(current_pos) != target_pos:
         if iterations >= max_iterations:
             print("Warning: Maximum iterations reached. Aborting pathfinding.")
-            # Depending on requirements, you might raise an error or return partial path
             raise RuntimeError("Pathfinding exceeded maximum iterations")
-            # return path_moves # Or return the path found so far
 
         # Calculate the difference vector to the target
         dx = target_pos[0] - current_pos[0]
         dy = target_pos[1] - current_pos[1]
 
-        # Determine the best move based on the direction vector signs
         # math.copysign(1, x) returns 1.0 with the sign of x, or 0.0 if x is 0
         # int() converts this to -1, 0, or 1
         move_x = int(math.copysign(1, dx)) if dx != 0 else 0
         move_y = int(math.copysign(1, dy)) if dy != 0 else 0
 
-        # The chosen move is (move_x, move_y)
         chosen_move: Move = (move_x, move_y)
-
-        # --- Verification (optional, as our logic guarantees it's valid) ---
-        # if chosen_move not in VALID_MOVES and chosen_move != (0,0):
-        #    # This condition should ideally never be met with the current logic
-        #    raise ValueError(f"Calculated move {chosen_move} is not in VALID_MOVES")
-        # If dx and dy are both 0, we should already be at the target and the loop condition handles this.
 
         # Apply the move to the current position
         current_pos[0] += chosen_move[0]
         current_pos[1] += chosen_move[1]
 
         print(f"Move added to list: {chosen_move}")
-        # Record the move
         path_moves.append(chosen_move)
-
-        # print(f"  Moved {chosen_move}, New position: {tuple(current_pos)}") # Optional debug print
 
         iterations += 1
 
@@ -71,10 +58,10 @@ def find_path_to_flower(hive_pos: Position, flower_pos: Position) -> List[Move]:
 
 def find_path_to_hive(hive_pos: Position, current_pos: Position) -> List[Move]:
     """
-    Calculates a sequence of moves from hive_pos to flower_pos using VALID_MOVES.
+    Calculates a sequence of moves from current_pos to hive_pos using VALID_MOVES.
 
     Args:
-        hive_pos: A tuple (x, y) representing the starting hive position.
+        hive_pos: A tuple (x, y) representing the hive position.
         current_pos: A tuple (x, y) representing the bee current position.
 
     Returns:
@@ -96,38 +83,24 @@ def find_path_to_hive(hive_pos: Position, current_pos: Position) -> List[Move]:
     while tuple(current_pos) != target_pos:
         if iterations >= max_iterations:
             print("Warning: Maximum iterations reached. Aborting pathfinding.")
-            # Depending on requirements, you might raise an error or return partial path
             raise RuntimeError("Pathfinding exceeded maximum iterations")
-            # return path_moves # Or return the path found so far
 
-        # Calculate the difference vector to the target
         dx = target_pos[0] - current_pos[0]
         dy = target_pos[1] - current_pos[1]
 
-        # Determine the best move based on the direction vector signs
         # math.copysign(1, x) returns 1.0 with the sign of x, or 0.0 if x is 0
         # int() converts this to -1, 0, or 1
         move_x = int(math.copysign(1, dx)) if dx != 0 else 0
         move_y = int(math.copysign(1, dy)) if dy != 0 else 0
 
-        # The chosen move is (move_x, move_y)
         chosen_move: Move = (move_x, move_y)
-
-        # --- Verification (optional, as our logic guarantees it's valid) ---
-        # if chosen_move not in VALID_MOVES and chosen_move != (0,0):
-        #    # This condition should ideally never be met with the current logic
-        #    raise ValueError(f"Calculated move {chosen_move} is not in VALID_MOVES")
-        # If dx and dy are both 0, we should already be at the target and the loop condition handles this.
 
         # Apply the move to the current position
         current_pos[0] += chosen_move[0]
         current_pos[1] += chosen_move[1]
 
         print(f"Move added to list: {chosen_move}")
-        # Record the move
         path_moves.append(chosen_move)
-
-        # print(f"  Moved {chosen_move}, New position: {tuple(current_pos)}") # Optional debug print
 
         iterations += 1
 

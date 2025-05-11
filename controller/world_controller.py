@@ -8,12 +8,11 @@ from utils.constants import VALID_MOVE
 
 class WorldController(Observer, BaseObservable):
     """
-    [2.1 World Controller] Manages interactions between bees and the world environment.
+    [2.1 World Controller] Manages interactions between bees and the world.
     
     Attributes:
         world (World): The world instance being controlled
-        width (int): Width of the world
-        height (int): Height of the world
+        world_size (Tuple(int,int)): Size of the world
     """
     def __init__(self, world, world_size=(50, 50)):
         super().__init__()
@@ -23,10 +22,6 @@ class WorldController(Observer, BaseObservable):
     def _check_property_collision(self, bee_pos, property):
         """
         [2.1.1 Collision detection] Check if bee position collides with a property.
-        
-        Args:
-            bee_pos (tuple): Bee's current position (x, y)
-            property (Property): Property to check collision against
             
         Returns:
             bool: True if bee collides with property
@@ -39,10 +34,6 @@ class WorldController(Observer, BaseObservable):
     def _handle_flower_interaction(self, bee, flower):
         """
         [2.1.2 Nectar collection] Handle bee interaction with a flower.
-        
-        Args:
-            bee (Bee): The bee interacting with the flower
-            flower (Property): The flower property
         """
         if flower.has_nectar:
             print(f"Bee {bee.ID} match property {flower.type}, {flower.pos}, now coming back hive")
@@ -54,10 +45,6 @@ class WorldController(Observer, BaseObservable):
     def _handle_obstacle_interaction(self, bee, obstacle):
         """
         [2.1.1 Collision detection] Handle bee interaction with an obstacle.
-        
-        Args:
-            bee (Bee): The bee interacting with the obstacle
-            obstacle (Property): The obstacle property
         """
         print(f"Bee {bee.ID} match preventions, find another way")
         # Water obstacles require two step backs
@@ -68,17 +55,6 @@ class WorldController(Observer, BaseObservable):
             bee.step_back()
 
     def __update_bee_moved(self, bee):
-        """
-        Handles bee movement and collision detection.
-        
-        This method:
-        - Checks if bee has collided with any property
-        - Determines the type of collision (flower, obstacle)
-        - Triggers appropriate response based on collision type
-        
-        Args:
-            bee (Bee): The bee that has moved
-        """
         # Skip collision check if bee already has nectar
         if bee.hasNectar:
             return
@@ -97,14 +73,7 @@ class WorldController(Observer, BaseObservable):
 
     def update(self, observable: BaseObservable) -> None:
         """
-        Observer pattern implementation.
-        
-        Updates the world state when a bee moves:
-        - Only processes bees that are outside the hive
-        - Triggers collision detection and response
-        
-        Args:
-            observable (BaseObservable): The observable object (Bee) that triggered the update
+        update() when a bee moves to detect collision with flower and obstacle.
         """
         if isinstance(observable, Bee):
             if not observable.inhive:

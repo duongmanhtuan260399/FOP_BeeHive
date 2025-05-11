@@ -8,27 +8,30 @@ The Bee Simulation Project is a Python-based simulation that models and visualis
 - **controller/hive_controller.py**: Handles hive operations, such as nectar storage and path information sharing.
 - **model/bee.py**: Defines the Bee class, including movement, energy management, and interaction with the environment.
 - **model/hive.py**: Represents the hive structure and manages bee interactions within the hive.
-- **model/world.py**: Represents the world grid and manages obstacles and flowers.
-- **view/hive_view.py**: Visualises the hive and bee activities using Matplotlib.
-- **test/test_world_controller.py**: Contains unit tests for the WorldController class.
-- **test/test_hive_controller.py**: Contains unit tests for the HiveController class.
-- **test/test_hive_view.py**: Contains unit tests for the HiveView class.
-- **run_tests.py**: Script to run the unit tests for the project.
+- **model/world.py**: Represents the world grid and properties.
+- **view/hive_view.py**: Visualises the hive.
+- **view/world_view.py**: Visualises the world.
 
 ## Dependencies
-- **Python 3.x**: The project is written in Python 3.
-- **Matplotlib**: Used for visualization.
-- **NumPy**: Used for numerical operations.
-- **unittest**: Used for running unit tests.
+
+- **matplotlib**: Used for visualisation 
+- **numpy**: Used for array operations 
+- **random**: Used for simulating real-world probabilities 
+- **abc**: Used for defining abstract base classes 
+- **enum**: Used for defining constants like bee states and property types 
+- **unittest**: Used for running unit tests 
+- **argparse**: Used for parsing command-line arguments 
+- **json** – Used for loading and parsing configuration files.
+
 
 ## How to Run the Program
 
-1. **Install Dependencies**:
+1. **Install Dependencies**: Example:
    ```bash
    pip install matplotlib numpy
    ```
 
-2. **Run the Tests**:
+2. **Run the Tests**: Example:
    ```bash
    python run_tests.py
    ```

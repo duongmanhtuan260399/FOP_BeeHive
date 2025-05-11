@@ -13,7 +13,7 @@ class BeeState(Enum):
     States:
         WANDERING: Bee is exploring the world randomly
         FOLLOWING: Bee is following a known path to a flower
-        RETURNING: Bee is returning to the hive with nectar
+        RETURNING: Bee is returning to the hive
     """
     WANDERING = 1
     FOLLOWING = 2
@@ -21,20 +21,19 @@ class BeeState(Enum):
 
 
 class Bee(BaseObservable, Observer):
+
+    # [1.1.3 Energy Management] Constants for energy management
+    MIN_ENERGY_TO_LEAVE = 50
+    ENERGY_CHARGE_AMOUNT = 25
+    ENERGY_CONSUMPTION = 1
+    COMMUNICATION_THRESHOLD = 0.8
+
     """
     [1.1 Bee] Represents a worker bee in the simulation with its behavior and state management.
     
-    The bee can:
-    - Move around the world
-    - Collect nectar from flowers
-    - Return to the hive
-    - Share information with other bees
-    - Manage its energy levels
-    
     Attributes:
-        ID (int): Unique identifier for the bee
-        pos (tuple): Current (x,y) position in the world
-        age (int): Age of the bee
+        ID (int): Unique ID for the bee
+        pos (tuple): Current (x,y) position
         inhive (bool): Whether the bee is inside the hive
         hasNectar (bool): Whether the bee is carrying nectar
         hive_pos (tuple): Position of the hive
@@ -44,15 +43,7 @@ class Bee(BaseObservable, Observer):
         path_to_hive (list): Path back to the hive
         state (BeeState): Current state of the bee
         energy (int): Current energy level
-        _move_invalid (bool): Flag for invalid moves
     """
-
-    # [1.1.3 Energy Management] Constants for energy management
-    MIN_ENERGY_TO_LEAVE = 50
-    ENERGY_CHARGE_AMOUNT = 25
-    ENERGY_CONSUMPTION = 1
-    COMMUNICATION_THRESHOLD = 0.8
-
     def __init__(self, ID, pos, hive_pos, hive_size, world_size):
         """
         Initialize a new bee with default values and position.
@@ -82,13 +73,6 @@ class Bee(BaseObservable, Observer):
     def _adjust_boundaries(self, x, y):
         """
         [1.1.2 Movement] Adjust coordinates to stay within world boundaries.
-        
-        Args:
-            x (int): X coordinate
-            y (int): Y coordinate
-            
-        Returns:
-            tuple: Adjusted (x, y) coordinates
         """
         x = max(1, min(x, self.world_size[0] - 2))
         y = max(1, min(y, self.world_size[1] - 2))
@@ -97,9 +81,6 @@ class Bee(BaseObservable, Observer):
     def _try_alternative_move(self, old_pos):
         """
         [1.1.2 Movement] Attempt to find an alternative move when the current move is invalid.
-        
-        Args:
-            old_pos (tuple): The position before the invalid move
             
         Returns:
             bool: True if a valid alternative move was found, False otherwise
@@ -126,10 +107,7 @@ class Bee(BaseObservable, Observer):
 
     def _execute_move(self, move: Move) -> bool:
         """
-        [1.1.2 Movement] Execute a move for the bee, handling boundaries and obstacles.
-        
-        Args:
-            move (Move): The move to execute
+        [1.1.2 Movement] Execute a move for the bee.
             
         Returns:
             bool: True if the move was successful, False otherwise
@@ -238,12 +216,6 @@ class Bee(BaseObservable, Observer):
         """
         [1.1 Bee] Update the bee's state and position for each timestep.
         
-        This method handles:
-        - Energy management
-        - State transitions
-        - Movement decisions
-        - Hive entry/exit
-        
         Returns:
             bool: True if the bee moved, False otherwise
         """
@@ -259,23 +231,18 @@ class Bee(BaseObservable, Observer):
         return False
 
     def get_pos(self):
-        """Get the current position of the bee."""
         return self.pos
 
     def get_inhive(self):
-        """Check if the bee is inside the hive."""
         return self.inhive
 
     def set_inhive(self, value):
-        """Set whether the bee is inside the hive."""
         self.inhive = value
 
     def get_nectar(self):
-        """Check if the bee is carrying nectar."""
         return self.hasNectar
 
     def set_nectar(self, value):
-        """Set whether the bee is carrying nectar."""
         self.hasNectar = value
 
     def set_nectar_found(self):
@@ -290,15 +257,14 @@ class Bee(BaseObservable, Observer):
         self.inhive = False
 
     def step_back(self):
-        """[1.1.2 Movement] Mark the last move as invalid, called by WorldController when bee hits an obstacle."""
+        """
+        [1.1.2 Movement] Mark the last move as invalid when bee hits an obstacle.
+        """
         self._move_invalid = True
 
     def update(self, observable: BaseObservable) -> None:
         """
-        [1.1.4 Path finding] Handle updates from observed objects (HiveController).
-        
-        Args:
-            observable (BaseObservable): The object that triggered the update
+        update () when hive notifies about the shared information
         """
         from controller.hive_controller import HiveController
         from controller.world_controller import WorldController

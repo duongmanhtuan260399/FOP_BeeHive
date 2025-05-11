@@ -2,12 +2,7 @@ import numpy as np
 
 class Comb:
     """
-    [1.3.1 Comb] Represents a single comb cell in the hive.
-    
-    Each comb cell:
-    - Has a specific position in the hive grid
-    - Can store nectar
-    - Is part of the larger hive structure
+    [1.3.1 Comb] A single comb cell in the hive.
     
     Attributes:
         pos (tuple): Position (row, col) of the comb in the hive
@@ -21,14 +16,9 @@ class Hive:
     """
     [1.3 Hive] Represents the bee hive structure.
     
-    The hive is a 2D grid where:
-    - Each cell is represented by a Comb object
-    - The background has a default value of 10
-    - Combs are arranged in a grid pattern
-    
     Attributes:
         hive (numpy.ndarray): 2D array representing the hive grid
-        clist (list): List of Comb objects in the hive
+        clist (list): List of Combs in the hive
     """
     def __init__(self, hive_size):
         # Initialize the hive grid with default value 10
