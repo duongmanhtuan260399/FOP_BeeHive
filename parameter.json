@@ -1,5 +1,5 @@
 {
-    "time_steps": 100,
-    "num_bees": 1
+    "time_steps": 500,
+    "num_bees": 10
 }
  
