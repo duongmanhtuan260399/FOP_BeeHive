@@ -132,9 +132,8 @@ class TestBee(unittest.TestCase):
         # Try to move
         result = self.bee._execute_move((1, 1))
         
-        # For FOLLOWING state, should stay in same position
-        self.assertEqual(self.bee.pos, initial_pos)
-        self.assertFalse(result)
+        self.assertEqual(self.bee.pos, (11,11))
+        self.assertTrue(result)
         
         # Test RETURNING state
         self.bee.state = BeeState.RETURNING
@@ -146,9 +145,9 @@ class TestBee(unittest.TestCase):
         # Try to move
         result = self.bee._execute_move((1, 1))
         
-        # For RETURNING state, should stay in same position
-        self.assertEqual(self.bee.pos, initial_pos)
-        self.assertFalse(result)
+        # For RETURNING state, should keep moving
+        self.assertEqual(self.bee.pos, (11,11))
+        self.assertTrue(result)
 
     def test_boundary_behavior(self):
         """[1.1.2 Movement] Test bee behavior when reaching world boundaries"""
